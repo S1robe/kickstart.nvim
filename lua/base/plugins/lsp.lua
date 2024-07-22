@@ -213,7 +213,7 @@ return {
         'bash-language-server',
         'css-lsp',
         'deno',
-        'elint-lsp',
+        'eslint-lsp',
         'eslint_d',
         'glint',
         'html-lsp',
