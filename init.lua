@@ -68,8 +68,14 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+vim.cmd.setlocal 'spell spelllang=en_us'
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
+
+-- TODO: Refactor these assignments to use the map_keys
+local function map_keys(mode, keys, does, desc)
+  vim.keymap.set(mode, keys, does, { desc = desc or 'Custom Keybind' })
+end
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
@@ -105,6 +111,14 @@ vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
+
+-- Special formatting things for markdown
+map_keys({ 'i', 'n' }, '<F13>', '# ', 'Markdown for Header 1')
+map_keys({ 'i', 'n' }, '<F14>', '## ', 'Markdown for Header 2')
+map_keys({ 'i', 'n' }, '<F15>', '### ', 'Markdown for Header 3')
+map_keys({ 'i', 'n' }, '<F16>', '#### ', 'Markdown for Header 4')
+map_keys({ 'i', 'n' }, '<F17>', '##### ', 'Markdown for Header 5')
+map_keys({ 'i', 'n' }, '<F18>', '###### ', 'Markdown for Header 6')
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
