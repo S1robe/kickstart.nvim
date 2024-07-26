@@ -160,14 +160,7 @@ return {
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
-        --
         volar = {
           filetypes = { 'vue', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' },
           init_options = {
@@ -182,7 +175,7 @@ return {
             },
           },
         },
-        tsserver = {},
+        -- tsserver = {},
         java_language_server = {
           settings = {
             workspace = {
@@ -208,6 +201,7 @@ return {
             },
           },
         },
+        markdownlint = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -249,6 +243,7 @@ return {
         'typescript-language-server',
         'vetur-vls',
         'vue-language-server',
+        'sqlls',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -281,7 +276,7 @@ return {
       },
     },
     opts = {
-      notify_on_error = false,
+      notify_on_error = true,
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
@@ -294,6 +289,8 @@ return {
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        markdown = { 'markdownlint' },
+        -- javascript = { 'eslint', 'prettier' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -470,6 +467,7 @@ return {
     config = function()
       local lint = require 'lint'
       lint.linters_by_ft = lint.linters_by_ft or {}
+      lint.linters_by_ft['markdown'] = { 'markdownlint', 'vale' }
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
       -- instead set linters_by_ft like this:
       -- lint.linters_by_ft = lint.linters_by_ft or {}
