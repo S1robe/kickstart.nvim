@@ -202,6 +202,7 @@ return {
           },
         },
         markdownlint = {},
+        marksman = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -410,8 +411,8 @@ return {
           { name = 'luasnip' },
           { name = 'vsnip' },
           { name = 'spell' },
-          -- { name = 'path' },
-          -- { name = 'buffer' },
+          { name = 'path' },
+          { name = 'buffer' },
         },
         formatting = {
           format = function(entry, vim_item)
@@ -420,8 +421,8 @@ return {
               luasnip = '[Snip]',
               vsnip = '[Snip]',
               spell = '[Spelling]',
-              -- path = '[Path]',
-              -- buffer = '[File]',
+              path = '[Path]',
+              buffer = '[File]',
             })[entry.source.name]
             return vim_item
           end,
@@ -467,7 +468,7 @@ return {
     config = function()
       local lint = require 'lint'
       lint.linters_by_ft = lint.linters_by_ft or {}
-      lint.linters_by_ft['markdown'] = { 'markdownlint', 'vale' }
+      lint.linters_by_ft['markdown'] = { 'markdownlint' }
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
       -- instead set linters_by_ft like this:
       -- lint.linters_by_ft = lint.linters_by_ft or {}
