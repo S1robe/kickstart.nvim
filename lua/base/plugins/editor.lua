@@ -114,6 +114,7 @@ return {
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
+      require('mini.icons').setup()
       -- Better Around/Inside textobjects
       --
       -- Examples:
@@ -129,6 +130,8 @@ return {
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
+      -- Replaces Oil.nvim
+      require('mini.files').setup()
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
@@ -155,28 +158,28 @@ return {
     main = 'ibl',
     opts = {},
   },
-  {
-    'nvim-neo-tree/neo-tree.nvim',
-    version = '*',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
-      'MunifTanjim/nui.nvim',
-    },
-    cmd = 'Neotree',
-    keys = {
-      { '\\', ':Neotree reveal<CR>', { desc = 'NeoTree reveal' } },
-    },
-    opts = {
-      filesystem = {
-        window = {
-          mappings = {
-            ['\\'] = 'close_window',
-          },
-        },
-      },
-    },
-  },
+  -- {
+  --   'nvim-neo-tree/neo-tree.nvim',
+  --   version = '*',
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
+  --     'MunifTanjim/nui.nvim',
+  --   },
+  --   cmd = 'Neotree',
+  --   keys = {
+  --     { '\\', ':Neotree reveal<CR>', { desc = 'NeoTree reveal' } },
+  --   },
+  --   opts = {
+  --     filesystem = {
+  --       window = {
+  --         mappings = {
+  --           ['\\'] = 'close_window',
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
   {
     'windwp/nvim-autopairs',
     event = 'InsertEnter',

@@ -77,6 +77,8 @@ local function map_keys(mode, keys, does, desc)
   vim.keymap.set(mode, keys, does, { desc = desc or 'Custom Keybind' })
 end
 
+map_keys('n', '<leader>E', '<cmd>lua MiniFiles.open()<CR>')
+
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -103,8 +105,6 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- Custom Keympas for navigation
--- Requires the Oil plugin
-vim.keymap.set('n', '<leader>E', vim.cmd.Oil, { desc = 'Explore filesystem' })
 vim.keymap.set({ 'n', 'i' }, '<C-s>', vim.cmd.write, { desc = 'Write Buffer' })
 vim.keymap.set({ 'n', 'i' }, '<C-S>', vim.cmd.wa, { desc = 'Write all buffers' })
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")

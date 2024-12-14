@@ -176,17 +176,17 @@ return {
           },
         },
         -- tsserver = {},
-        java_language_server = {
-          settings = {
-            workspace = {
-              checkThirdParty = true,
-              library = {
-                '/lib/jvm/default',
-                unpack(vim.api.nvim_get_runtime_file('', true)),
-              },
-            },
-          },
-        },
+        -- java_language_server = {
+        --   settings = {
+        --     workspace = {
+        --       checkThirdParty = true,
+        --       library = {
+        --         '/lib/jvm/default',
+        --         unpack(vim.api.nvim_get_runtime_file('', true)),
+        --       },
+        --     },
+        --   },
+        -- },
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -226,7 +226,7 @@ return {
         'glint',
         'html-lsp',
         'htmlhint',
-        'java-language-server',
+        --'java-language-server',
         'lua-language-server',
         'pyflakes',
         'pylint',
