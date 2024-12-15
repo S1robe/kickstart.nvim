@@ -77,7 +77,7 @@ local function map_keys(mode, keys, does, desc)
   vim.keymap.set(mode, keys, does, { desc = desc or 'Custom Keybind' })
 end
 
-map_keys('n', '<leader>E', '<cmd>lua MiniFiles.open()<CR>')
+map_keys('n', '<leader>E', '<cmd>lua MiniFiles.open(vim.api.nvim_buf_get_name(0))<CR>')
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
