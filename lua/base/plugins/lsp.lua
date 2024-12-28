@@ -245,6 +245,7 @@ return {
         'vetur-vls',
         'vue-language-server',
         'sqlls',
+        'jsonlint',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -469,6 +470,7 @@ return {
       local lint = require 'lint'
       lint.linters_by_ft = lint.linters_by_ft or {}
       lint.linters_by_ft['markdown'] = { 'markdownlint' }
+      lint.linters_by_ft['json'] = { 'jsonlint' }
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
       -- instead set linters_by_ft like this:
       -- lint.linters_by_ft = lint.linters_by_ft or {}

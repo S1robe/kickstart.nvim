@@ -43,7 +43,7 @@ vim.opt.signcolumn = 'yes'
 vim.opt.updatetime = 75
 
 -- Column Cutoff
-vim.opt.colorcolumn = '85'
+vim.opt.colorcolumn = '120'
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
