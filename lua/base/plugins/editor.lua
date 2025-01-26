@@ -103,10 +103,12 @@ return {
   --   end,
   -- },
   {
-    'nyoom-engineering/oxocarbon.nvim',
+    'baliestri/aura-theme',
+    lazy = false,
     priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'oxocarbon'
+    config = function(plugin)
+      vim.opt.rtp:append(plugin.dir .. '/packages/neovim')
+      vim.cmd.colorscheme 'aura-dark'
     end,
   },
   -- Highlight todo, notes, etc in comments
