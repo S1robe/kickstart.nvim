@@ -1,3 +1,5 @@
+vim.print = _G.dd
+
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
@@ -43,7 +45,10 @@ vim.opt.signcolumn = 'yes'
 vim.opt.updatetime = 75
 
 -- Column Cutoff
-vim.opt.colorcolumn = '120'
+vim.opt.colorcolumn = '80'
+
+-- Color term display
+-- vim.opt.termguicolors = true
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner

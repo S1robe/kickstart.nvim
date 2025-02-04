@@ -244,7 +244,7 @@ return {
         'typescript-language-server',
         'vetur-vls',
         'vue-language-server',
-        'sqlls',
+        --'sqlls',
         'jsonlint',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
