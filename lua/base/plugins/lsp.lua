@@ -9,11 +9,11 @@ return {
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/neodev.nvim', opts = {} },
+      { 'folke/neodev.nvim',       opts = {} },
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -201,8 +201,6 @@ return {
             },
           },
         },
-        markdownlint = {},
-        marksman = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -221,16 +219,10 @@ return {
         'ast-grep',
         'bash-language-server',
         'css-lsp',
-        'deno',
-        'eslint_d',
-        'glint',
         'html-lsp',
         'htmlhint',
         --'java-language-server',
         'lua-language-server',
-        'pyflakes',
-        'pylint',
-        'pyright',
         'python-lsp-server',
         'quick-lint-js',
         'rustywind',
@@ -283,7 +275,7 @@ return {
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = true, cpp = true, vue = true }
         return {
           timeout_ms = 500,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
@@ -291,8 +283,7 @@ return {
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        markdown = { 'markdownlint' },
-        -- javascript = { 'eslint', 'prettier' },
+        javascript = { 'quick-lint-js', 'ast-grep', 'standardjs' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
