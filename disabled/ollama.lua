@@ -27,7 +27,7 @@ return {
 
   ---@type Ollama.Config
   opts = {
-    model = 'codellama:13b',
+    model = 'devstral',
     url = 'http://127.0.0.1:11434',
     serve = {
       on_start = true,
