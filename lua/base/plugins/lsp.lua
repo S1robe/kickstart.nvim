@@ -8,113 +8,535 @@ return {
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { 'j-hui/fidget.nvim', opts = {} },
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-      -- used for completion, annotations and signatures of Neovim apis
       { 'folke/neodev.nvim', opts = {} },
     },
     config = function()
       -- LSP servers and clients are able to communicate to each other what features they support.
-      --  By default, Neovim doesn't support everything that is in the LSP specification.
-      --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
-      -- Enable the following language servers
-      --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
-      --
-      --  Add any additional override configuration in the following tables. Available keys are:
-      --  - cmd (table): Override the default command used to start the server
-      --  - filetypes (table): Override the default list of associated filetypes for the server
-      --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
-      --  - settings (table): Override the default settings passed when initializing the server.
-      --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      -- Helper function to check for local configs
+      local function get_local_config(config_name)
+        local config_path = vim.fn.getcwd() .. '/' .. config_name
+        if vim.fn.filereadable(config_path) == 1 then
+          return config_path
+        end
+        return nil
+      end
+
+      -- Get Vue language server path for ts_ls plugin (Mason v2)
+      local vue_language_server_path = vim.fn.stdpath 'data' .. '/mason/packages/vue-language-server/node_modules/@vue/language-server'
+
+      -- LSP Server Configurations grouped by language
       local servers = {
-        -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
-        -- tsserver = {},
-        -- volar = {
-        --   filetypes = { 'vue', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' },
-        --   init_options = {
-        --     vue = {
-        --       hybridMode = false,
-        --     },
-        --     typescript = {
-        --       -- Global install of typescript
-        --       --tsdk = '~/.nvm/versions/node/v20.11.1/lib/node_modules/typescript',
-        --       -- Current project version and what I will likely use
-        --       tsdk = vim.fn.getcwd() .. 'node_modules/typescript/lib',
-        --     },
-        --   },
-        -- },
-        -- tsserver = {},
-        -- java_language_server = {
-        --   settings = {
-        --     workspace = {
-        --       checkThirdParty = true,
-        --       library = {
-        --         '/lib/jvm/default',
-        --         unpack(vim.api.nvim_get_runtime_file('', true)),
-        --       },
-        --     },
-        --   },
-        -- },
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ JavaScript/TypeScript/Web Development                   │
+        -- ╰─────────────────────────────────────────────────────────╯
+        ts_ls = { -- TypeScript/JavaScript with Vue support via plugin
+          init_options = {
+            plugins = {
+              {
+                name = '@vue/typescript-plugin',
+                location = vue_language_server_path,
+                languages = { 'vue' },
+              },
+            },
+          },
+          filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+          settings = {
+            typescript = {
+              tsdk = './node_modules/typescript/lib',
+              enablePromptUseWorkspaceTsdk = true,
+              preferences = {
+                importModuleSpecifier = 'non-relative',
+                includePackageJsonAutoImports = 'on',
+              },
+              inlayHints = {
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+              },
+            },
+            javascript = {
+              preferences = {
+                importModuleSpecifier = 'non-relative',
+              },
+            },
+          },
+          root_dir = function(fname)
+            local util = require 'lspconfig.util'
+            return util.root_pattern('nuxt.config.ts', 'nuxt.config.js')(fname)
+              or util.root_pattern('tsconfig.json', 'jsconfig.json', 'package.json')(fname)
+              or util.find_git_ancestor(fname)
+          end,
+        },
+
+        vue_ls = {}, -- Still setup but in hybrid mode (default) for Vue-specific features
+
+        html = {
+          filetypes = { 'html', 'templ' },
+          settings = {},
+        },
+
+        cssls = {
+          settings = {
+            css = {
+              validate = true,
+              lint = {
+                unknownAtRules = 'ignore',
+              },
+            },
+            scss = {
+              validate = true,
+              lint = {
+                unknownAtRules = 'ignore',
+              },
+            },
+            less = {
+              validate = true,
+              lint = {
+                unknownAtRules = 'ignore',
+              },
+            },
+          },
+        },
+
+        tailwindcss = {
+          filetypes = { 'html', 'css', 'scss', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue' },
+          settings = {
+            tailwindCSS = {
+              experimental = {
+                classRegex = {
+                  { 'class\\s*[:=]\\s*["\']([^"\']*)["\']', 1 },
+                  { 'className\\s*[:=]\\s*["\']([^"\']*)["\']', 1 },
+                  { 'tw\\s*`([^`]*)`', 1 },
+                  { 'tw\\s*=\\s*{\\s*["\']([^"\']*)["\']', 1 },
+                },
+              },
+            },
+          },
+        },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Python                                                  │
+        -- ╰─────────────────────────────────────────────────────────╯
+        basedpyright = { -- Best: Type checking + completion
+          settings = {
+            basedpyright = {
+              analysis = {
+                typeCheckingMode = 'standard',
+                autoImportCompletions = true,
+                diagnosticSeverityOverrides = {
+                  reportUnusedImport = 'warning',
+                  reportUnusedVariable = 'warning',
+                },
+              },
+            },
+            python = {
+              pythonPath = get_local_config '.venv/bin/python' or 'python',
+            },
+          },
+        },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Go                                                      │
+        -- ╰─────────────────────────────────────────────────────────╯
+        gopls = {
+          settings = {
+            gopls = {
+              gofumpt = true,
+              codelenses = {
+                gc_details = false,
+                generate = true,
+                regenerate_cgo = true,
+                run_govulncheck = true,
+                test = true,
+                tidy = true,
+                upgrade_dependency = true,
+                vendor = true,
+              },
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
+              },
+              analyses = {
+                fieldalignment = true,
+                nilness = true,
+                unusedparams = true,
+                unusedwrite = true,
+                useany = true,
+              },
+              usePlaceholders = true,
+              completeUnimported = true,
+              staticcheck = true,
+              directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
+              semanticTokens = true,
+            },
+          },
+        },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Java/Kotlin/JVM Languages                               │
+        -- ╰─────────────────────────────────────────────────────────╯
+        jdtls = {
+          cmd = { 'jdtls' },
+          settings = {
+            java = {
+              configuration = {
+                runtimes = {
+                  {
+                    name = 'JavaSE-17',
+                    path = '/usr/lib/jvm/java-17-openjdk',
+                  },
+                },
+              },
+            },
+          },
+        },
+
+        kotlin_language_server = {
+          settings = {
+            kotlin = {
+              compiler = {
+                jvm = {
+                  target = '17',
+                },
+              },
+            },
+          },
+        },
+
+        groovyls = {
+          cmd = { 'java', '-jar', vim.fn.expand '~/.local/share/nvim/mason/packages/groovy-language-server/groovy-language-server-all.jar' },
+          filetypes = { 'groovy' },
+          root_dir = function(fname)
+            return require('lspconfig').util.find_git_ancestor(fname)
+          end,
+        },
+
+        gradle_ls = {},
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ C/C++/Rust/Systems Programming                          │
+        -- ╰─────────────────────────────────────────────────────────╯
+        clangd = {
+          cmd = {
+            'clangd',
+            '--background-index',
+            '--clang-tidy',
+            '--header-insertion=iwyu',
+            '--completion-style=detailed',
+            '--function-arg-placeholders',
+            '--fallback-style=llvm',
+          },
+          init_options = {
+            usePlaceholders = true,
+            completeUnimported = true,
+            clangdFileStatus = true,
+          },
+        },
+
+        rust_analyzer = {
+          settings = {
+            ['rust-analyzer'] = {
+              imports = {
+                granularity = {
+                  group = 'module',
+                },
+                prefix = 'self',
+              },
+              cargo = {
+                buildScripts = {
+                  enable = true,
+                },
+              },
+              procMacro = {
+                enable = true,
+              },
+            },
+          },
+        },
+
+        asm_lsp = {
+          filetypes = { 'asm', 's', 'S' },
+        },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Shell/Bash Scripting                                    │
+        -- ╰─────────────────────────────────────────────────────────╯
+        bashls = {
+          filetypes = { 'sh', 'bash', 'zsh' },
+        },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Lua                                                     │
+        -- ╰─────────────────────────────────────────────────────────╯
         lua_ls = {
-          -- cmd = {...},
-          -- filetypes = { ...},
-          -- capabilities = {},
           settings = {
             Lua = {
+              runtime = { version = 'LuaJIT' },
+              workspace = {
+                checkThirdParty = false,
+                library = {
+                  vim.env.VIMRUNTIME,
+                  '${3rd}/luv/library',
+                  '${3rd}/busted/library',
+                },
+              },
               completion = {
                 callSnippet = 'Replace',
               },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
+              telemetry = { enable = false },
+              diagnostics = {
+                globals = { 'vim' },
+              },
             },
+          },
+        },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Functional Languages (Haskell, OCaml)                   │
+        -- ╰─────────────────────────────────────────────────────────╯
+        hls = {
+          filetypes = { 'haskell', 'lhaskell', 'cabal' },
+        },
+
+        ocamllsp = {
+          cmd = { 'ocamllsp' },
+          filetypes = { 'ocaml', 'ocaml.menhir', 'ocaml.interface', 'ocaml.ocamllex', 'reason', 'dune' },
+          root_dir = require('lspconfig').util.root_pattern('*.opam', 'esy.json', 'package.json', '.ocamlformat'),
+        },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Dart/Flutter                                            │
+        -- ╰─────────────────────────────────────────────────────────╯
+        -- dartls = {
+        --   cmd = { 'dart', 'language-server', '--protocol=lsp' },
+        -- },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Infrastructure/DevOps (Docker, CI/CD)                   │
+        -- ╰─────────────────────────────────────────────────────────╯
+        dockerls = {
+          settings = {
+            docker = {
+              languageserver = {
+                formatter = {
+                  ignoreMultilineInstructions = true,
+                },
+              },
+            },
+          },
+        },
+
+        docker_compose_language_service = {},
+
+        gh_actions_ls = {},
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Data/Configuration Languages (JSON, YAML, SQL)          │
+        -- ╰─────────────────────────────────────────────────────────╯
+        jsonls = {
+          settings = {
+            json = {
+              schemas = require('schemastore').json.schemas(),
+              validate = { enable = true },
+            },
+          },
+        },
+
+        yamlls = {
+          settings = {
+            yaml = {
+              schemaStore = {
+                enable = false,
+                url = '',
+              },
+              schemas = require('schemastore').yaml.schemas(),
+            },
+          },
+        },
+
+        sqls = { -- Better than sqlls - more features and actively maintained
+          cmd = { 'sqls' },
+          filetypes = { 'sql', 'mysql', 'postgresql' },
+          root_dir = function()
+            return vim.fn.getcwd()
+          end,
+          settings = {
+            sqls = {
+              connections = {
+                -- Configure your database connections here
+              },
+            },
+          },
+        },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Document/Markup Languages (Markdown, LaTeX)             │
+        -- ╰─────────────────────────────────────────────────────────╯
+        marksman = {},
+
+        texlab = {
+          settings = {
+            texlab = {
+              auxDirectory = '.',
+              bibtexFormatter = 'texlab',
+              build = {
+                executable = 'latexmk',
+                args = { '-pdf', '-interaction=nonstopmode', '-synctex=1', '%f' },
+                onSave = false,
+                forwardSearchAfter = false,
+              },
+              chktex = {
+                onOpenAndSave = false,
+                onEdit = false,
+              },
+              diagnosticsDelay = 300,
+              latexFormatter = 'latexindent',
+              latexindent = {
+                localSearchOnly = false,
+                modifyLineBreaks = false,
+              },
+            },
+          },
+        },
+
+        -- ╭─────────────────────────────────────────────────────────╮
+        -- │ Grammar/Spell Checking                                  │
+        -- ╰─────────────────────────────────────────────────────────╯
+        harper_ls = {
+          settings = {
+            ['harper-ls'] = {
+              linters = {
+                spell_check = true,
+                spelled_numbers = false,
+                an_a = true,
+                sentence_capitalization = true,
+                unclosed_quotes = true,
+                wrong_quotes = false,
+                long_sentences = true,
+                repeated_words = true,
+                spaces = true,
+                matcher = true,
+              },
+            },
+          },
+        },
+
+        ltex = { -- For grammar checking (ltex-ls-plus is not in Mason yet)
+          filetypes = { 'markdown', 'tex', 'plaintex', 'rst' },
+          settings = {
+            ltex = {
+              language = 'en-US',
+            },
+          },
+        },
+
+        typos_lsp = {
+          init_options = {
+            config = '~/.config/typos/typos.toml',
           },
         },
       }
 
       -- Ensure the servers and tools above are installed
-      --  To check the current status of installed tools and/or manually install
-      --  other tools, you can run
-      --    :Mason
-      --
-      --  You can press `g?` for help in this menu.
       require('mason').setup()
 
-      -- You can add other tools here that you want Mason to install
-      -- for you, so that they are available from within Neovim.
+      -- Complete list of tools to ensure are installed
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
-        'ast-grep',
-        'bash-language-server',
-        'css-lsp',
-        'html-lsp',
-        'htmlhint',
-        --'java-language-server',
-        'lua-language-server',
-        'python-lsp-server',
-        'quick-lint-js',
+        -- LSP's
+        'ts_ls',
+        'vue_ls',
+        'html',
+        'cssls',
+        'tailwindcss',
+        'basedpyright',
+        'gopls',
+        'jdtls',
+        'kotlin_language_server',
+        'groovyls',
+        'gradle_ls',
+        'clangd',
+        'rust_analyzer',
+        'asm_lsp',
+        'bashls',
+        'lua_ls',
+        'hls',
+        'ocamllsp',
+        'dockerls',
+        'docker_compose_language_service',
+        'gh_actions_ls',
+        'jsonls',
+        'yamlls',
+        'sqls',
+        'marksman',
+        'texlab',
+        'harper_ls',
+        'ltex',
+        'typos_lsp',
+
+        -- Formatters (Best & Fastest)
+        'asmfmt',
+        'bibtex-tidy',
+        'clang-format',
+        'fixjson',
+        'goimports',
+        'gofumpt',
+        'google-java-format',
+        'ktfmt',
+        'mdformat',
+        'ocamlformat',
+        'pgformatter',
+        'prettierd', -- Fastest for JS/TS/Web
+        'ruff', -- Python formatter & linter (fastest)
         'rustywind',
+        'shfmt',
+        'stylua',
+
+        -- Linters (Best & Fastest)
+        'checkstyle',
+        'cpplint',
+        'dotenv-linter',
+        'eslint_d', -- Fastest for JS/TS
+        'gitlint',
+        'gitleaks',
+        'golangci-lint',
+        'hadolint',
+        'htmlhint',
+        'jsonlint',
+        'ktlint',
+        'markdownlint',
+        'misspell',
+        'npm-groovy-lint',
+        -- 'oxlint', -- Very fast JS/TS linter
+        'ruff', -- Also a linter
         'semgrep',
         'shellcheck',
-        'shellharden',
-        'standardjs',
-        'stylua',
-        'tailwindcss-language-server',
+        'sqlfluff',
+        'textlint',
         'trivy',
-        'typescript-language-server',
-        'vetur-vls',
-        'vue-language-server',
-        --'sqlls',
-        'jsonlint',
+        'typos',
+        'write-good',
+        'yamllint',
+
+        -- Debug Adapters
+        'bash-debug-adapter',
+        -- 'dart-debug-adapter',
+
+        -- Additional tools
+        'ast-grep',
+        'tree-sitter-cli',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -149,27 +571,81 @@ return {
     opts = {
       notify_on_error = true,
       format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        -- return {
-        --   local disable_filetypes = { c = true, cpp = true, vue =  }
-        --   timeout_ms = 500,
-        --   lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-        -- }
+        -- Disable format on save for specific filetypes if needed
+        local disable_filetypes = { c = false, cpp = false }
+        return {
+          timeout_ms = 500,
+          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        }
       end,
       formatters_by_ft = {
+        -- JavaScript/TypeScript/Web (prettierd is fastest)
+        javascript = { 'prettierd', 'eslint_d' },
+        javascriptreact = { 'prettierd', 'eslint_d' },
+        typescript = { 'prettierd', 'eslint_d' },
+        typescriptreact = { 'prettierd', 'eslint_d' },
+        vue = { 'prettierd', 'eslint_d' },
+        html = { 'prettierd' },
+        css = { 'prettierd', 'rustywind' },
+        scss = { 'prettierd' },
+        less = { 'prettierd' },
+        json = { 'prettierd', 'fixjson' },
+        jsonc = { 'prettierd' },
+        yaml = { 'prettierd' },
+        graphql = { 'prettierd' },
+
+        -- Python (ruff is fastest)
+        python = { 'ruff_format', 'ruff_organize_imports' },
+
+        -- Go
+        go = { 'goimports', 'gofumpt' },
+        gomod = { 'goimports' },
+        gowork = { 'goimports' },
+
+        -- Rust
+        rust = { 'rustfmt' },
+
+        -- Java/Kotlin
+        java = { 'google-java-format' },
+        kotlin = { 'ktfmt' },
+        groovy = { 'npm-groovy-lint' },
+
+        -- C/C++
+        c = { 'clang-format' },
+        cpp = { 'clang-format' },
+
+        -- Shell
+        sh = { 'shfmt' },
+        bash = { 'shfmt' },
+        zsh = { 'shfmt' },
+
+        -- Lua
         lua = { 'stylua' },
-        javascript = { 'quick-lint-js', 'ast-grep', 'standardjs', 'eslint_d' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use a sub-list to tell conform to run *until* a formatter
-        -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+
+        -- SQL
+        sql = { 'pgformatter', 'sql-formatter' },
+        mysql = { 'sql-formatter' },
+        postgresql = { 'pgformatter' },
+
+        -- Document/Markup
+        markdown = { 'prettierd', 'mdformat' },
+        ['markdown.mdx'] = { 'prettierd' },
+        tex = { 'latexindent' },
+        plaintex = { 'latexindent' },
+
+        -- Functional Languages
+        ocaml = { 'ocamlformat' },
+        haskell = { 'fourmolu' },
+
+        -- Other
+        asm = { 'asmfmt' },
+        dockerfile = { 'dockerfile' },
+        toml = { 'taplo' },
+        dart = { 'dart_format' },
       },
     },
   },
+
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     lazy = false,
@@ -178,41 +654,34 @@ return {
       -- Snippet Engine & its associated nvim-cmp source
       {
         'L3MON4D3/LuaSnip',
-        build = (function()
-          -- Build Step is needed for regex support in snippets.
-          -- This step is not supported in many windows environments.
-          -- Remove the below condition to re-enable on windows.
-          if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
-            return
-          end
-          return 'make install_jsregexp'
-        end)(),
+        version = 'v2.*',
+        build = 'make install_jsregexp',
         dependencies = {
-          -- `friendly-snippets` contains a variety of premade snippets.
-          --    See the README about individual language/framework/plugin snippets:
-          --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          'rafamadriz/friendly-snippets',
+          config = function()
+            require('luasnip.loaders.from_vscode').lazy_load()
+            -- Load custom snippets
+            require('luasnip.loaders.from_vscode').lazy_load { paths = { './snippets' } }
+          end,
         },
       },
       'saadparwaiz1/cmp_luasnip',
 
       -- Adds other completion capabilities.
-      --  nvim-cmp does not ship with all sources by default. They are split
-      --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
-      'hrsh7th/vim-vsnip',
-      'hrsh7th/cmp-vsnip',
+      'hrsh7th/cmp-cmdline',
+      'hrsh7th/cmp-nvim-lsp-signature-help',
+      'hrsh7th/cmp-nvim-lua',
+      'onsails/lspkind.nvim', -- VSCode-like pictograms
     },
     config = function()
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
+      local lspkind = require 'lspkind'
+
       luasnip.config.setup {}
 
       cmp.setup {
@@ -222,45 +691,13 @@ return {
           end,
         },
         completion = { completeopt = 'menu,menuone,noinsert' },
-
-        -- For an understanding of why these mappings were
-        -- chosen, you will need to read `:help ins-completion`
-        --
-        -- No, but seriously. Please read `:help ins-completion`, it is really good!
         mapping = cmp.mapping.preset.insert {
-          -- Select the [n]ext item
           ['<C-n>'] = cmp.mapping.select_next_item(),
-          -- Select the [p]revious item
           ['<C-p>'] = cmp.mapping.select_prev_item(),
-
-          -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
-
-          -- Accept ([y]es) the completion.
-          --  This will auto-import if your LSP supports it.
-          --  This will expand snippets if the LSP sent a snippet.
           ['<C-y>'] = cmp.mapping.confirm { select = true },
-
-          -- If you prefer more traditional completion keymaps,
-          -- you can uncomment the following lines
-          --['<CR>'] = cmp.mapping.confirm { select = true },
-          --['<Tab>'] = cmp.mapping.select_next_item(),
-          --['<S-Tab>'] = cmp.mapping.select_prev_item(),
-
-          -- Manually trigger a completion from nvim-cmp.
-          --  Generally you don't need this, because nvim-cmp will display
-          --  completions whenever it has completion options available.
           ['<C-Space>'] = cmp.mapping.complete {},
-
-          -- Think of <c-l> as moving to the right of your snippet expansion.
-          --  So if you have a snippet that's like:
-          --  function $name($args)
-          --    $body
-          --  end
-          --
-          -- <c-l> will move you to the right of each of the expansion locations.
-          -- <c-h> is similar, except moving you backwards.
           ['<C-l>'] = cmp.mapping(function()
             if luasnip.expand_or_locally_jumpable() then
               luasnip.expand_or_jump()
@@ -271,107 +708,200 @@ return {
               luasnip.jump(-1)
             end
           end, { 'i', 's' }),
-
-          -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-          --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
           { name = 'nvim_lsp' },
+          { name = 'nvim_lsp_signature_help' },
           { name = 'luasnip' },
-          { name = 'vsnip' },
-          { name = 'spell' },
+          { name = 'nvim_lua' },
           { name = 'path' },
-          { name = 'buffer' },
+          { name = 'buffer', keyword_length = 3 },
         },
         formatting = {
-          format = function(entry, vim_item)
-            vim_item.menu = ({
-              nvim_lsp = '[LSP]',
-              luasnip = '[Snip]',
-              vsnip = '[Snip]',
-              spell = '[Spelling]',
-              path = '[Path]',
-              buffer = '[File]',
-            })[entry.source.name]
-            return vim_item
-          end,
+          format = lspkind.cmp_format {
+            mode = 'symbol_text',
+            maxwidth = 50,
+            ellipsis_char = '...',
+            before = function(entry, vim_item)
+              vim_item.menu = ({
+                nvim_lsp = '[LSP]',
+                luasnip = '[Snippet]',
+                buffer = '[Buffer]',
+                path = '[Path]',
+                nvim_lua = '[Lua]',
+              })[entry.source.name]
+              return vim_item
+            end,
+          },
         },
       }
+
+      -- `/` cmdline setup.
+      cmp.setup.cmdline('/', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = 'buffer' },
+        },
+      })
+
+      -- `:` cmdline setup.
+      cmp.setup.cmdline(':', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = 'path' },
+        }, {
+          { name = 'cmdline' },
+        }),
+      })
     end,
   },
+
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'javascript', 'typescript', 'regex', 'css' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'cpp',
+        'css',
+        'dart',
+        'diff',
+        'dockerfile',
+        'go',
+        'gomod',
+        'gosum',
+        'gowork',
+        'graphql',
+        'groovy',
+        'haskell',
+        'html',
+        'java',
+        'javascript',
+        'jsdoc',
+        'json',
+        'jsonc',
+        'kotlin',
+        'latex',
+        'lua',
+        'luadoc',
+        'luap',
+        'markdown',
+        'markdown_inline',
+        'ocaml',
+        'python',
+        'query',
+        'regex',
+        'rust',
+        'scss',
+        'sql',
+        'toml',
+        'tsx',
+        'typescript',
+        'vim',
+        'vimdoc',
+        'vue',
+        'yaml',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
         enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby', 'javascript', 'typescript', 'python' },
+        additional_vim_regex_highlighting = false,
       },
-      indent = { enable = true, disable = { 'ruby', 'javascript', 'typescript', 'python' } },
+      indent = { enable = true },
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = '<C-space>',
+          node_incremental = '<C-space>',
+          scope_incremental = false,
+          node_decremental = '<bs>',
+        },
+      },
     },
     config = function(_, opts)
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-
       -- Prefer git instead of curl in order to improve connectivity in some environments
       require('nvim-treesitter.install').prefer_git = true
-      ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
-
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
+
   { -- Linting
     'mfussenegger/nvim-lint',
     event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       local lint = require 'lint'
-      lint.linters_by_ft = lint.linters_by_ft or {}
-      lint.linters_by_ft['markdown'] = { 'markdownlint' }
-      lint.linters_by_ft['json'] = { 'jsonlint' }
-      lint.linters_by_ft['javascript'] = { 'eslint_d' }
-      lint.linters_by_ft['typescript'] = { 'eslint_d' }
-      -- To allow other plugins to add linters to require('lint').linters_by_ft,
-      -- instead set linters_by_ft like this:
-      -- lint.linters_by_ft = lint.linters_by_ft or {}
-      -- lint.linters_by_ft['markdown'] = { 'markdownlint' }
-      --
-      -- However, note that this will enable a set of default linters,
-      -- which will cause errors unless these tools are available:
-      -- {
-      --   clojure = { "clj-kondo" },
-      --   dockerfile = { "hadolint" },
-      --   inko = { "inko" },
-      --   janet = { "janet" },
-      --   json = { "jsonlint" },
-      --   ruby = { "ruby" },
-      --   terraform = { "tflint" },
-      -- }
-      --
-      -- You can disable the default linters by setting their filetypes to nil:
-      -- lint.linters_by_ft['clojure'] = nil
-      -- lint.linters_by_ft['dockerfile'] = nil
-      -- lint.linters_by_ft['inko'] = nil
-      -- lint.linters_by_ft['janet'] = nil
-      -- lint.linters_by_ft['json'] = nil
-      -- lint.linters_by_ft['markdown'] = nil
-      -- lint.linters_by_ft['rst'] = nil
-      -- lint.linters_by_ft['ruby'] = nil
-      -- lint.linters_by_ft['terraform'] = nil
-      -- lint.linters_by_ft['text'] = nil
+
+      lint.linters_by_ft = {
+        -- JavaScript/TypeScript/Web
+        javascript = { 'eslint_d' }, -- oxlint for extra fast checks
+        javascriptreact = { 'eslint_d' },
+        typescript = { 'eslint_d' },
+        typescriptreact = { 'eslint_d' },
+        vue = { 'eslint_d' },
+        html = { 'htmlhint' },
+        css = { 'stylelint' },
+        scss = { 'stylelint' },
+        less = { 'stylelint' },
+
+        -- Python
+        python = { 'ruff', 'mypy' }, -- ruff is fastest
+
+        -- Go
+        go = { 'golangcilint' },
+
+        -- Rust
+        rust = { 'clippy' },
+
+        -- C/C++
+        c = { 'cpplint' },
+        cpp = { 'cpplint' },
+
+        -- Java/Kotlin/JVM
+        java = { 'checkstyle' },
+        kotlin = { 'ktlint' },
+        groovy = { 'npm-groovy-lint' },
+
+        -- Shell
+        sh = { 'shellcheck' },
+        bash = { 'shellcheck' },
+        zsh = { 'shellcheck' },
+
+        -- Data/Config
+        json = { 'jsonlint' },
+        yaml = { 'yamllint' },
+        dockerfile = { 'hadolint' },
+        dotenv = { 'dotenv-linter' },
+
+        -- Document/Markup
+        markdown = { 'markdownlint', 'write-good' },
+        tex = { 'chktex' },
+
+        -- SQL
+        sql = { 'sqlfluff' },
+
+        -- Git
+        gitcommit = { 'gitlint' },
+      }
+
+      -- Additional linters for all files
+      lint.linters_by_ft['*'] = { 'typos', 'misspell' }
+
+      -- Custom settings for textlint
+      lint.linters.textlint = {
+        cmd = 'textlint',
+        stdin = true,
+        args = { '--format', 'json', '--stdin', '--stdin-filename', '%filepath' },
+        stream = 'stdout',
+        ignore_exitcode = true,
+        parser = require('lint.parser').from_pattern([[(%d+):(%d+)-%d+:%d+%s+(%w+)%s+(.+)]], { 'lnum', 'col', 'severity', 'message' }),
+      }
+
+      -- Add textlint to markdown files
+      table.insert(lint.linters_by_ft.markdown, 'textlint')
 
       -- Create autocommand which carries out the actual linting
-      -- on the specified events.
       local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
       vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
         group = lint_augroup,
@@ -381,4 +911,10 @@ return {
       })
     end,
   },
+
+  -- Additional plugins for better language support
+  { 'b0o/schemastore.nvim' }, -- JSON/YAML schemas
+  { 'folke/trouble.nvim', opts = {} }, -- Better diagnostics
+  { 'nvim-treesitter/nvim-treesitter-textobjects' }, -- Enhanced text objects
+  { 'windwp/nvim-autopairs', event = 'InsertEnter', opts = {} }, -- Auto pairs
 }
