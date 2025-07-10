@@ -5,9 +5,8 @@
 require 'custom.keys'
 
 -- Groups
-local latexLoad = vim.api.nvim_create_augroup("LatexPlugins", { clear = true })
+local latexLoad = vim.api.nvim_create_augroup('LatexPlugins', { clear = true })
 local lspLoad = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true })
-
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -22,14 +21,12 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 -- Load vimtex for tex files and .bib files
 vim.api.nvim_create_autocmd('FileType', {
-  group = latexLoad, 
-  pattern = { "tex" },
+  group = latexLoad,
+  pattern = { 'tex' },
   callback = function()
-    require("lazy").load({ plugins = {"vimtex"}})
+    require('lazy').load { plugins = { 'vimtex' } }
   end,
 })
-
-
 
 --  This function gets run when an LSP attaches to a particular buffer.
 --    That is to say, every time a new file is opened that is associated with
@@ -40,18 +37,17 @@ vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(event)
     -- NOTE: Remember that Lua is a real programming language, and as such it is possible
     -- to define small helper and utility functions so you don't have to repeat yourself.
-    
 
     --  This is where a variable was first declared, or where a function is defined, etc.
     --  To jump back, press <C-t>.
-    mapp('n','gd', require('snacks.picker').lsp_definitions, '[G]oto [D]efinition')
+    mapp('n', 'gd', require('snacks.picker').lsp_definitions, '[G]oto [D]efinition')
 
     -- WARN: This is not Goto Definition, this is Goto Declaration.
     --  For example, in C this would take you to the header.
-    mapp('n','gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+    mapp('n', 'gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
     -- Find references for the word under your cursor.
-    mapp('n','gr', require('snacks.picker').lsp_references, '[G]oto [R]eferences')
+    mapp('n', 'gr', require('snacks.picker').lsp_references, '[G]oto [R]eferences')
 
     -- Jump to the implementation of the word under your cursor.
     --  Useful when your language has ways of declaring types without an actual implementation.
@@ -60,27 +56,27 @@ vim.api.nvim_create_autocmd('LspAttach', {
     -- Jump to the type of the word under your cursor.
     --  Useful when you're not sure what type a variable is and you want to see
     --  the definition of its *type*, not where it was *defined*.
-    mapp('n','<leader>D', require('snacks.picker').lsp_type_definitions, 'Type [D]efinition')
+    mapp('n', '<leader>D', require('snacks.picker').lsp_type_definitions, 'Type [D]efinition')
 
     -- Fuzzy find all the symbols in your current document.
     --  Symbols are things like variables, functions, types, etc.
-    mapp('n','<leader>ds', require('snacks.picker').lsp_symbols, '[D]ocument [S]ymbols')
+    mapp('n', '<leader>ds', require('snacks.picker').lsp_symbols, '[D]ocument [S]ymbols')
 
     -- Fuzzy find all the symbols in your current workspace.
     --  Similar to document symbols, except searches over your entire project.
-    mapp('n','<leader>ws', require('snacks.picker').lsp_workspace_symbols, '[W]orkspace [S]ymbols')
+    mapp('n', '<leader>ws', require('snacks.picker').lsp_workspace_symbols, '[W]orkspace [S]ymbols')
 
     -- Rename the variable under your cursor.
     --  Most Language Servers support renaming across files, etc.
-    mapp('n','<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+    mapp('n', '<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
 
     -- Execute a code action, usually your cursor needs to be on top of an error
     -- or a suggestion from your LSP for this to activate.
-    mapp('n','<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+    mapp('n', '<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
     -- Opens a popup that displays documentation about the word under your cursor
     --  See `:help K` for why this keymapp.
-    mapp('n','K', vim.lsp.buf.hover, 'Hover Documentation')
+    mapp('n', 'K', vim.lsp.buf.hover, 'Hover Documentation')
 
     mapp('n', '<leader>e', "<cmd>lua vim.diagnostic.open_float(0, {scope='line'})<CR>")
 
@@ -117,7 +113,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     --
     -- This may be unwanted, since they displace some of your code
     if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-      mapp('n','<leader>th', function()
+      mapp('n', '<leader>th', function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
       end, '[T]oggle Inlay [H]ints')
     end

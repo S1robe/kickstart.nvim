@@ -306,15 +306,15 @@ return {
         -- ╭─────────────────────────────────────────────────────────╮
         -- │ Functional Languages (Haskell, OCaml)                   │
         -- ╰─────────────────────────────────────────────────────────╯
-        hls = {
-          filetypes = { 'haskell', 'lhaskell', 'cabal' },
-        },
-
-        ocamllsp = {
-          cmd = { 'ocamllsp' },
-          filetypes = { 'ocaml', 'ocaml.menhir', 'ocaml.interface', 'ocaml.ocamllex', 'reason', 'dune' },
-          root_dir = require('lspconfig').util.root_pattern('*.opam', 'esy.json', 'package.json', '.ocamlformat'),
-        },
+        -- hls = {
+        --   filetypes = { 'haskell', 'lhaskell', 'cabal' },
+        -- },
+        --
+        -- ocamllsp = {
+        --   cmd = { 'ocamllsp' },
+        --   filetypes = { 'ocaml', 'ocaml.menhir', 'ocaml.interface', 'ocaml.ocamllex', 'reason', 'dune' },
+        --   root_dir = require('lspconfig').util.root_pattern('*.opam', 'esy.json', 'package.json', '.ocamlformat'),
+        -- },
 
         -- ╭─────────────────────────────────────────────────────────╮
         -- │ Dart/Flutter                                            │
@@ -462,81 +462,23 @@ return {
         'cssls',
         'tailwindcss',
         'basedpyright',
-        'gopls',
-        'jdtls',
-        'kotlin_language_server',
-        'groovyls',
-        'gradle_ls',
-        'clangd',
-        'rust_analyzer',
-        'asm_lsp',
-        'bashls',
-        'lua_ls',
-        'hls',
-        'ocamllsp',
-        'dockerls',
-        'docker_compose_language_service',
-        'gh_actions_ls',
-        'jsonls',
-        'yamlls',
-        'sqls',
-        'marksman',
-        'texlab',
-        'harper_ls',
-        'ltex',
-        'typos_lsp',
 
         -- Formatters (Best & Fastest)
-        'asmfmt',
-        'bibtex-tidy',
-        'clang-format',
         'fixjson',
-        'goimports',
-        'gofumpt',
-        'google-java-format',
-        'ktfmt',
         'mdformat',
-        'ocamlformat',
-        'pgformatter',
         'prettierd', -- Fastest for JS/TS/Web
         'ruff', -- Python formatter & linter (fastest)
-        'rustywind',
         'shfmt',
         'stylua',
 
         -- Linters (Best & Fastest)
         'checkstyle',
-        'cpplint',
-        'dotenv-linter',
         'eslint_d', -- Fastest for JS/TS
-        'gitlint',
-        'gitleaks',
-        'golangci-lint',
-        'hadolint',
-        'htmlhint',
-        'jsonlint',
-        'ktlint',
-        'markdownlint',
-        'misspell',
-        'npm-groovy-lint',
-        -- 'oxlint', -- Very fast JS/TS linter
-        'ruff', -- Also a linter
-        'semgrep',
-        'shellcheck',
-        'sqlfluff',
-        'textlint',
-        'trivy',
-        'typos',
-        'write-good',
-        'yamllint',
-
-        -- Debug Adapters
-        'bash-debug-adapter',
-        -- 'dart-debug-adapter',
 
         -- Additional tools
         'ast-grep',
         'tree-sitter-cli',
+        'semgrep',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -916,5 +858,5 @@ return {
   { 'b0o/schemastore.nvim' }, -- JSON/YAML schemas
   { 'folke/trouble.nvim', opts = {} }, -- Better diagnostics
   { 'nvim-treesitter/nvim-treesitter-textobjects' }, -- Enhanced text objects
-  { 'windwp/nvim-autopairs', event = 'InsertEnter', opts = {} }, -- Auto pairs
+  { 'windwp/nvim-autopairs', opts = {} }, -- Auto pairs
 }

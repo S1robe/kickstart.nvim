@@ -105,7 +105,7 @@ return {
       -- Replaces Oil.nvim
       require('mini.files').setup()
 
-      -- Autopairing 
+      -- Autopairing
       require('mini.pairs').setup()
 
       -- Formatting
