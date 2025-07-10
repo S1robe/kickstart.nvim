@@ -1,7 +1,6 @@
 -------------------------------------------------------------------------------
 -- Settings
 -- ----------------------------------------------------------------------------
-vim.cmd.colorscheme("retrobox")
 
 vim.opt.shiftwidth = 4 -- Treat tabs as 4 spaces
 vim.opt.expandtab = true -- Expand tabs into spaces
@@ -123,4 +122,9 @@ end ---@diagnostic disable-next-line: undefined-field
 
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup("plugins")
+require("lazy").setup({
+    { "datsfilipe/vesper.nvim" },
+    { import = "plugins"} ,
+})
+
+vim.cmd.colorscheme("vesper")

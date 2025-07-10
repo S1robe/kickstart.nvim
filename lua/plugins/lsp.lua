@@ -158,7 +158,7 @@ return {
 
 			-- Get Vue language server path for ts_ls plugin (Mason v2)
 			local vue_language_server_path = vim.fn.stdpath("data")
-				.. "/mason/packages/vue-language-server/node_modules/@vue/language-server"
+				.. "/mason/packages/vue-language-server/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin/"
 
 			-- LSP Server Configurations grouped by language
 			local servers = {
