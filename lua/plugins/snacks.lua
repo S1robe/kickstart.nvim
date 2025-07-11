@@ -1,16 +1,14 @@
 return {
-  'folke/snacks.nvim',
+ 'folke/snacks.nvim',
   priority = 1000,
   lazy = false,
   ---@type snacks.Config
   opts = {
     bigfile = { enabled = true, size = 1024 * 1024 }, -- Bigfile enabled for 1Mb files LSP wont attach
     indent = { enabled = true, animate = { enabled = false } },
-    input = { enabled = true },
     picker = { enabled = true },
     rename = { enabled = true },
-    quickfile = { enabled = true },
-    statuscolumn = { enabled = true },
+    --quickfile = { enabled = true },
     util = { enabled = true },
   },
   keys = {
@@ -29,13 +27,6 @@ return {
       desc = 'File Explorer',
     },
     {
-      '<leader>ff',
-      function()
-        Snacks.picker.files()
-      end,
-      desc = 'Find Files',
-    },
-    {
       '<leader>/',
       function()
         Snacks.picker.grep()
@@ -50,7 +41,7 @@ return {
       desc = 'Buffer Lines',
     },
     {
-      '<leader>sq',
+      '<leader>q',
       function()
         Snacks.picker.qflist()
       end,
@@ -64,22 +55,7 @@ return {
       desc = 'Undo History',
     },
     {
-      '<leader>sw',
-      function()
-        Snacks.picker.grep_word()
-      end,
-      desc = 'Visual selection or word',
-      mode = { 'n', 'x' },
-    },
-    {
-      '<leader>sn',
-      function()
-        Snacks.picker.notifications()
-      end,
-      desc = 'Notification History',
-    },
-    {
-      '<leader>sN',
+      '<leader>s.',
       function()
         Snacks.picker.files { cwd = vim.fn.stdpath 'config' }
       end,
@@ -100,21 +76,21 @@ return {
       desc = 'Diagnostics',
     },
     {
-      '<leader>sH',
+      '<leader>sh',
       function()
         Snacks.picker.help()
       end,
       desc = 'Help Pages',
     },
     {
-      '<leader>sK',
+      '<leader>sk',
       function()
         Snacks.picker.keymaps()
       end,
       desc = 'Keymaps',
     },
     {
-      '<leader>sM',
+      '<leader>sm',
       function()
         Snacks.picker.man()
       end,
@@ -135,65 +111,8 @@ return {
       desc = 'Command History',
     },
 
-    -- git
-    {
-      '<leader>gb',
-      function()
-        Snacks.picker.git_branches()
-      end,
-      desc = 'Git Branches',
-    },
-    {
-      '<leader>gl',
-      function()
-        Snacks.picker.git_log()
-      end,
-      desc = 'Git Log',
-    },
-    {
-      '<leader>gL',
-      function()
-        Snacks.picker.git_log_line()
-      end,
-      desc = 'Git Log Line',
-    },
-    {
-      '<leader>gs',
-      function()
-        Snacks.picker.git_status()
-      end,
-      desc = 'Git Status',
-    },
-    {
-      '<leader>gS',
-      function()
-        Snacks.picker.git_stash()
-      end,
-      desc = 'Git Stash',
-    },
-    {
-      '<leader>gd',
-      function()
-        Snacks.picker.git_diff()
-      end,
-      desc = 'Git Diff (Hunks)',
-    },
-    {
-      '<leader>gl',
-      function()
-        Snacks.picker.git_log_file()
-      end,
-      desc = 'Git Log File',
-    },
 
     -- find
-    {
-      '<leader>fg',
-      function()
-        Snacks.picker.git_files()
-      end,
-      desc = 'Find Git Files',
-    },
     {
       '<leader>fp',
       function()
