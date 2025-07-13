@@ -317,6 +317,9 @@ return {
 						},
 					},
 				},
+                                ruff = {
+                                    filetypes = { "py", "python" },
+                                },
 			}
 
 			-- Ensure the servers and tools above are installed

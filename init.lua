@@ -105,6 +105,7 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
 -- Arbitrary Code to Buffer
 vim.keymap.set("n", "<leader>c", runcmd)
+vim.keymap.set("n", "<C-s>", "cmd write<CR>");
 
 -- Generate tags for current directory.
 vim.cmd("command! MakeTags !ctags -R .")
