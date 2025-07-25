@@ -581,6 +581,7 @@ return {
 		main = "nvim-treesitter.configs", -- Sets main module to use for opts
 		-- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 		opts = {
+
 			ensure_installed = {
 				"bash",
 				"c",
@@ -627,7 +628,7 @@ return {
 					"json",
 				},
 			},
-			indent = { enable = true, disable = { "ruby" } },
+			indent = { enable = false, disable = { "ruby" } },
 		},
 		-- There are additional nvim-treesitter modules that you can use to interact
 		-- with nvim-treesitter. You should go explore a few and see what interests you:

@@ -17,7 +17,7 @@ vim.opt.undofile = true
 vim.opt.backup = false
 vim.opt.writebackup = false
 vim.opt.updatetime = 300 -- Faster Completions
-vim.opt.timeoutlen = 500 -- Key Timeout
+vim.opt.timeoutlen = 800 -- Key Timeout
 vim.opt.ttimeoutlen = 0 -- Key Code
 vim.opt.autoread = true -- reload changes outside of neovim
 
@@ -33,6 +33,8 @@ vim.opt.wildmenu = true
 --vim.opt.wildmode = "longest:full,full"
 vim.opt.wildignore:append({ "*.o", "*.obj", "*.pyc", "*.class", "*.jar" })
 vim.opt.diffopt:append("linematch:60")
+
+--vim.opt.smartindent = false
 
 vim.g.mapleader = " "
 
@@ -90,11 +92,17 @@ vim.keymap.set("n", "<leader>a2", "mB")
 vim.keymap.set("n", "<leader>a3", "mC")
 vim.keymap.set("n", "<leader>a4", "mD")
 vim.keymap.set("n", "<leader>a5", "mE")
+vim.keymap.set("n", "<leader>a6", "mF")
+vim.keymap.set("n", "<leader>a7", "mG")
+vim.keymap.set("n", "<leader>a8", "mH")
 vim.keymap.set("n", "<leader>1", "g'A")
 vim.keymap.set("n", "<leader>2", "g'B")
 vim.keymap.set("n", "<leader>3", "g'C")
 vim.keymap.set("n", "<leader>4", "g'D")
 vim.keymap.set("n", "<leader>5", "g'E")
+vim.keymap.set("n", "<leader>6", "g'F")
+vim.keymap.set("n", "<leader>7", "g'G")
+vim.keymap.set("n", "<leader>8", "g'H")
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
@@ -105,7 +113,7 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
 -- Arbitrary Code to Buffer
 vim.keymap.set("n", "<leader>c", runcmd)
-vim.keymap.set("n", "<C-s>", "cmd write<CR>");
+vim.keymap.set("n", "<C-s>", "cmd write<CR>")
 
 -- Generate tags for current directory.
 vim.cmd("command! MakeTags !ctags -R .")
@@ -124,7 +132,7 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-    { import = "plugins"} ,
+	{ import = "plugins" },
 })
 
 vim.cmd.colorscheme("retrobox")
