@@ -135,4 +135,8 @@ require("lazy").setup({
 	{ import = "plugins" },
 })
 
-vim.cmd.colorscheme("retrobox")
+-- vim.cmd.colorscheme("habamax")
+-- vim.cmd.colorscheme("sorbe")
+vim.cmd.colorscheme("lunaperche")
+-- vim.cmd.colorscheme("wildcharm")
+-- vim.cmd.colorscheme("zaibatsu")
