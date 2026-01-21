@@ -317,9 +317,9 @@ return {
 						},
 					},
 				},
-                                ruff = {
-                                    filetypes = { "py", "python" },
-                                },
+                                -- ruff = {
+                                --     filetypes = { "py", "python" },
+                                -- },
 			}
 
 			-- Ensure the servers and tools above are installed
@@ -337,7 +337,7 @@ return {
 				"fixjson",
 				"mdformat",
 				"prettierd", -- Fastest for JS/TS/Web
-				"ruff", -- Python formatter & linter (fastest)
+				-- "ruff", -- Python formatter & linter (fastest)
 				"shfmt",
 				"stylua",
 
@@ -417,7 +417,7 @@ return {
 				graphql = { "prettierd" },
 
 				-- Python (ruff is fastest)
-				python = { "ruff_format", "ruff_organize_imports" },
+				-- python = { "ruff_format", "ruff_organize_imports" },
 
 				-- Go
 				go = { "goimports", "gofumpt" },
