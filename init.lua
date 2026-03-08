@@ -31,18 +31,11 @@ vim.opt.hlsearch = true
 vim.opt.smartcase = true
 vim.opt.wildmenu = true
 --vim.opt.wildmode = "longest:full,full"
-vim.opt.wildignore:append({ "*.o", "*.obj", "*.pyc", "*.class", "*.jar" })
+vim.opt.wildignore:append({ "*.o", "*.obj", "*.pyc", "*.class", "*.jar", ".gpg"})
 vim.opt.diffopt:append("linematch:60")
 
---vim.opt.smartindent = false
-
 vim.g.mapleader = " "
-
--- Folds
--- vim.o.foldenable = true
--- vim.opt.foldmethod = "expr"
--- vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- Rely on treesitter for folding
--- vim.opt.foldtext = "v:lua.vim.treesitter.foldtext()" -- Rely on treesitter for folding
+vim.g.maplocalleader = " "
 
 -- Splits
 vim.opt.splitbelow = true -- Horizontal splits go below
@@ -80,10 +73,6 @@ end
 -- ----------------------------------------------------------------------------
 
 -- Navigation
-vim.keymap.set("n", "<C-j>", "<C-w>j")
-vim.keymap.set("n", "<C-h>", "<C-w>h")
-vim.keymap.set("n", "<C-k>", "<C-w>k")
-vim.keymap.set("n", "<C-l>", "<C-w>l")
 vim.keymap.set("n", "<leader>E", "<cmd>Explore<CR>")
 
 -- Marks & Harpoon Replacement
@@ -118,25 +107,10 @@ vim.keymap.set("n", "<C-s>", "cmd write<CR>")
 -- Generate tags for current directory.
 vim.cmd("command! MakeTags !ctags -R .")
 
--- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-	if vim.v.shell_error ~= 0 then
-		error("Error cloning lazy.nvim:\n" .. out)
-	end
-end ---@diagnostic disable-next-line: undefined-field
-
-vim.opt.rtp:prepend(lazypath)
-
-require("lazy").setup({
-	{ import = "plugins" },
-})
-
 -- vim.cmd.colorscheme("habamax")
 -- vim.cmd.colorscheme("sorbe")
 vim.cmd.colorscheme("lunaperche")
 -- vim.cmd.colorscheme("wildcharm")
 -- vim.cmd.colorscheme("zaibatsu")
+
+require('pkgs')
