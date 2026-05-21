@@ -1,12 +1,9 @@
 -- shiftwidth, expandab, path, mouse, signcolumn, showmatch, autoread, auto indent, undofile & dir
 vim.cmd('set sw=4 et sts=-1 path+=** mouse=nv scl=yes:3 sm ar ai udf udir=$HOME/.nvim/undodir')
-
--- no banner for file explorer
-vim.g.netrw_banner = 0
-
 --- Highlights
 vim.cmd.filetype("plugin on")
 vim.cmd.syntax("enable")
+-- Scratch pad
 vim.keymap.set("n", "<space>c", function()
     vim.ui.input({}, function(c)
             if c and c~="" then
@@ -17,13 +14,53 @@ vim.keymap.set("n", "<space>c", function()
             end
         end)
 end)
+
+-- window manip
 vim.keymap.set('n', "<C-h>", "<C-w><")
 vim.keymap.set('n', "<C-l>", "<C-w>>")
 vim.keymap.set('n', "<C-j>", "<C-w>-")
 vim.keymap.set('n', "<C-k>", "<C-w>+")
 
--- vim.cmd.colorscheme("habamax")
--- vim.cmd.colorscheme("sorbe")
-vim.cmd.colorscheme("lunaperche")
--- vim.cmd.colorscheme("wildcharm")
--- vim.cmd.colorscheme("zaibatsu")
+-- Tabs 
+vim.keymap.set('n', '<space>t', ':tabnew<CR>')
+
+-- vim.cmd.colorscheme("retrobox")
+--vim.cmd.colorscheme("lunaperche")
+require('colors.luna_pastel').setup()
+
+vim.pack.add({
+    'https://github.com/nvim-treesitter/nvim-treesitter',
+    'https://github.com/nvim-lspconfig/nvim-lspconfig',
+    'https://github.com/nvim-tree/nvim-web-devicons',
+    'https://github.com/MeanderingProgrammer/render-markdown.nvim',
+    'https://github.com/mason-org/mason.nvim',
+    'https://github.com/mason-org/mason-lspconfig.nvim',
+    'https://github.com/stevearc/conform.nvim',
+})
+
+-- Plugins
+vim.lsp.codelens.enable(true)
+require('nvim-treesitter').setup()
+require('mason').setup()
+local lsp = require('lspconfig') -- nvim-lspconfig
+local mason_lspconfig = require('mason-lspconfig')
+local conform = require("conform")
+
+local lsps = {  "basedpyright", "ts_ls", "ast_grep" }
+local ft_formatters = {
+    python = {"black"},
+    javascript = {"prettier"},
+    typescript = {"prettier"},
+    html = {'prettier'},
+    css = {'prettier'},
+    markdown = {'prettier'},
+}
+
+mason_lspconfig.setup({ ensure_installed = lsps, automatic_enable = lsps })
+
+conform.setup({
+    formatters_by_ft = ft_formatters,
+    fmt_exec_path = vim.fn.stdpath("data") .. "/mason/bin",
+})
+
+vim.keymap.set({'n', 'v'}, '<space>F', function() require("conform").format({ async = true }) end)
