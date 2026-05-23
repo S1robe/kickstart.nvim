@@ -42,7 +42,6 @@ vim.pack.add({
 vim.lsp.codelens.enable(true)
 require('nvim-treesitter').setup()
 require('mason').setup()
-local lsp = require('lspconfig') -- nvim-lspconfig
 local mason_lspconfig = require('mason-lspconfig')
 local conform = require("conform")
 
