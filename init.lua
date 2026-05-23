@@ -30,7 +30,7 @@ require('colors.luna_pastel').setup()
 
 vim.pack.add({
     'https://github.com/nvim-treesitter/nvim-treesitter',
-    'https://github.com/nvim-lspconfig/nvim-lspconfig',
+    'https://github.com/neovim/nvim-lspconfig',
     'https://github.com/nvim-tree/nvim-web-devicons',
     'https://github.com/MeanderingProgrammer/render-markdown.nvim',
     'https://github.com/mason-org/mason.nvim',
