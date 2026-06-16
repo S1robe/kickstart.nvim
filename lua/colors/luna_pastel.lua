@@ -16,13 +16,15 @@ M.setup = function()
     fg          = "#EAEAEA", -- ash white
     grey_dark   = "#222222",
     grey_med    = "#555555",
-    lavender    = "#C79FEF",
-    peach       = "#FFCC99",
-    lime        = "#A1F791",
-    pastel_blue = "#A3C4F3",
-    error_red   = "#E75151",
-    warn_yellow = "#FFFD74",
-    selection   = "#736B9A",
+    lavender    = "#B18CFF", -- keywords / types
+    peach       = "#FFB86C", -- strings
+    lime        = "#7EE787", -- success / additions
+    pastel_blue = "#79C0FF", -- functions / identifiers
+
+    error_red   = "#FF6B6B", -- errors
+    warn_yellow = "#E3D26F", -- warnings
+
+    selection   = "#3F3A5F", -- muted selection
   }
   local a = {}
 
@@ -34,7 +36,7 @@ M.setup = function()
   vim.api.nvim_set_hl(0, "Character", { fg = colors.pastel_blue })
   vim.api.nvim_set_hl(0, "Number", { fg = colors.lime })
   vim.api.nvim_set_hl(0, "Boolean", { fg = colors.lime })
-  vim.api.nvim_set_hl(0, "Identifier", { fg = colors.lime })
+  vim.api.nvim_set_hl(0, "Identifier", { fg = colors.fg })
   vim.api.nvim_set_hl(0, "Function", { fg = colors.peach, bold = true })
   vim.api.nvim_set_hl(0, "Statement", { fg = colors.lavender, bold = true })
   vim.api.nvim_set_hl(0, "Conditional", { fg = colors.lavender, bold = true })
@@ -75,7 +77,7 @@ M.setup = function()
   vim.api.nvim_set_hl(0, "@character", { fg = colors.pastel_blue })
   vim.api.nvim_set_hl(0, "@number", { fg = colors.lime })
   vim.api.nvim_set_hl(0, "@boolean", { fg = colors.lime })
-  vim.api.nvim_set_hl(0, "@variable", { fg = colors.lime })
+  vim.api.nvim_set_hl(0, "@variable", { fg = colors.fg })
   vim.api.nvim_set_hl(0, "@function", { fg = colors.peach, bold = true })
   vim.api.nvim_set_hl(0, "@function.call", { fg = colors.peach })
   vim.api.nvim_set_hl(0, "@function.builtin", { fg = colors.lavender })
@@ -87,7 +89,7 @@ M.setup = function()
   vim.api.nvim_set_hl(0, "@type", { fg = colors.lime, bold = true })
   vim.api.nvim_set_hl(0, "@type.builtin", { fg = colors.lime })
   vim.api.nvim_set_hl(0, "@include", { fg = colors.peach })
-  vim.api.nvim_set_hl(0, "@variable.builtin", { fg = colors.lime })
+  vim.api.nvim_set_hl(0, "@variable.builtin", { fg = colors.fg })
   vim.api.nvim_set_hl(0, "@namespace", { fg = colors.lavender })
   vim.api.nvim_set_hl(0, "@parameter", { fg = colors.fg })
   vim.api.nvim_set_hl(0, "@property", { fg = colors.fg })

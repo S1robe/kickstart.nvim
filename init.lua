@@ -1,5 +1,7 @@
 -- shiftwidth, expandab, path, mouse, signcolumn, showmatch, autoread, auto indent, undofile & dir
 vim.cmd('set sw=4 et sts=-1 path+=** mouse=nv scl=yes:3 sm ar ai udf udir=$HOME/.nvim/undodir')
+vim.g.netrw_keepdir = 0
+
 --- Highlights
 vim.cmd.filetype("plugin on")
 vim.cmd.syntax("enable")
@@ -45,7 +47,7 @@ require('mason').setup()
 local mason_lspconfig = require('mason-lspconfig')
 local conform = require("conform")
 
-local lsps = {  "basedpyright", "ts_ls", "ast_grep" }
+local lsps = {  "basedpyright", "ts_ls", "ast_grep", "arduino_language_server", "clangd", "bashls" } -- Clangd requried for arduino to work.
 local ft_formatters = {
     python = {"black"},
     javascript = {"prettier"},
@@ -63,3 +65,4 @@ conform.setup({
 })
 
 vim.keymap.set({'n', 'v'}, '<space>F', function() require("conform").format({ async = true }) end)
+vim.keymap.set({'n'}, '<space>dd', function() vim.diagnostic.setqflist({ open = true }) end)
