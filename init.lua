@@ -1,6 +1,7 @@
 -- shiftwidth, expandab, path, mouse, signcolumn, showmatch, autoread, auto indent, undofile & dir
 vim.cmd('set sw=4 et sts=-1 path+=** mouse=nv scl=yes:3 sm ar ai udf udir=$HOME/.nvim/undodir')
 vim.g.netrw_keepdir = 0
+vim.g.netrw_banner = 0
 
 --- Highlights
 vim.cmd.filetype("plugin on")
