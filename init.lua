@@ -2,10 +2,15 @@
 vim.cmd('set sw=4 et sts=-1 path+=** mouse=nv scl=yes:3 sm ar ai udf udir=$HOME/.nvim/undodir')
 vim.g.netrw_keepdir = 0
 vim.g.netrw_banner = 0
+vim.g.netrw_winsize = 20
+vim.g.netrw_localmkdir = "mkdir -p" -- change mkdir cmd
+vim.g.netrw_localcopycmd = "cp -r" -- change copy command
+vim.g.netrw_localrmdir = "rm -r" -- change delete command
 
 --- Highlights
 vim.cmd.filetype("plugin on")
 vim.cmd.syntax("enable")
+
 -- Scratch pad
 vim.keymap.set("n", "<space>c", function()
     vim.ui.input({}, function(c)
@@ -18,35 +23,16 @@ vim.keymap.set("n", "<space>c", function()
         end)
 end)
 
+vim.keymap.set({'n'}, '<space>dd', function() vim.diagnostic.setqflist({ open = true }) end)
+require('colors.luna_pastel').setup() 
+-- vim.cmd.colorscheme("retrobox")
+-- vim.cmd.colorscheme("lunaperche")
+
 -- window manip
 vim.keymap.set('n', "<C-h>", "<C-w><")
 vim.keymap.set('n', "<C-l>", "<C-w>>")
 vim.keymap.set('n', "<C-j>", "<C-w>-")
 vim.keymap.set('n', "<C-k>", "<C-w>+")
-
--- Tabs 
-vim.keymap.set('n', '<space>t', ':tabnew<CR>')
-
--- vim.cmd.colorscheme("retrobox")
---vim.cmd.colorscheme("lunaperche")
-require('colors.luna_pastel').setup()
-
-vim.pack.add({
-    'https://github.com/nvim-treesitter/nvim-treesitter',
-    'https://github.com/neovim/nvim-lspconfig',
-    'https://github.com/nvim-tree/nvim-web-devicons',
-    'https://github.com/MeanderingProgrammer/render-markdown.nvim',
-    'https://github.com/mason-org/mason.nvim',
-    'https://github.com/mason-org/mason-lspconfig.nvim',
-    'https://github.com/stevearc/conform.nvim',
-})
-
--- Plugins
-vim.lsp.codelens.enable(true)
-require('nvim-treesitter').setup()
-require('mason').setup()
-local mason_lspconfig = require('mason-lspconfig')
-local conform = require("conform")
 
 local lsps = {  "basedpyright", "ts_ls", "ast_grep", "arduino_language_server", "clangd", "bashls" } -- Clangd requried for arduino to work.
 local ft_formatters = {
@@ -57,13 +43,23 @@ local ft_formatters = {
     css = {'prettier'},
     markdown = {'prettier'},
 }
+local plugins = {
+    { src = 'https://github.com/nvim-treesitter/nvim-treesitter',           name = 'nvim-treesitter' },
+    { src = 'https://github.com/neovim/nvim-lspconfig',                     name = 'nvim-lspconfig', config = nil },
+    { src = 'https://github.com/MeanderingProgrammer/render-markdown.nvim', name = 'render-markdown' },
+    { src = 'https://github.com/mason-org/mason.nvim',                      name = 'mason' },
+    { src = 'https://github.com/mason-org/mason-lspconfig.nvim',            name = 'mason-lspconfig' , config = { ensure_installed = lsps, automatic_enable = lsps }},
+    { src = 'https://github.com/stevearc/conform.nvim',                     name = 'conform',  config = { formatters_by_ft = ft_formatters, fmt_exec_path = vim.fn.stdpath("data") .. "/mason/bin", } },
+    { src = 'https://github.com/nvim-tree/nvim-web-devicons',               name = 'nvim-web-devicons' },
+}
 
-mason_lspconfig.setup({ ensure_installed = lsps, automatic_enable = lsps })
+vim.pack.add(plugins)
 
-conform.setup({
-    formatters_by_ft = ft_formatters,
-    fmt_exec_path = vim.fn.stdpath("data") .. "/mason/bin",
-})
+for _, plugin in ipairs(plugins) do
+    if not plugin.config == nil then
+        _G[plugin.name] = require(plugin.name)
+        _G[plugin.name].setup(plugin.config)
+    end
+end
 
 vim.keymap.set({'n', 'v'}, '<space>F', function() require("conform").format({ async = true }) end)
-vim.keymap.set({'n'}, '<space>dd', function() vim.diagnostic.setqflist({ open = true }) end)
