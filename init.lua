@@ -6,8 +6,19 @@ vim.g.netrw_localmkdir = "mkdir -p" -- change mkdir cmd
 vim.g.netrw_localcopycmd = "cp -r" -- change copy command
 vim.g.netrw_localrmdir = "rm -r" -- change delete command
 vim.cmd('set listchars=space:·,tab:->\\')
---vim.bo.omnifunc = "v:lua.vim.lsp.omnifunc"
 
+-- vim.cmd.colorscheme("retrobox")
+ vim.cmd.colorscheme("lunaperche")
+
+-- window manip
+vim.keymap.set('n', "<C-h>", "<C-w><")
+vim.keymap.set('n', "<C-l>", "<C-w>>")
+vim.keymap.set('n', "<C-j>", "<C-w>-")
+vim.keymap.set('n', "<C-k>", "<C-w>+")
+vim.keymap.set('n', "<C-d>", "<C-d>zz")
+vim.keymap.set('n', "<C-u>", "<C-u>zz")
+vim.keymap.set('n', "<space>E", ":Explore<CR>")
+vim.keymap.set('n', "<space>b", ":ls<CR>")
 
 --- Highlights
 vim.cmd.filetype("plugin on")
@@ -33,25 +44,12 @@ vim.api.nvim_create_user_command("Vimgrep", function(opts)
   vim.cmd("vimgrep /" .. escaped .. "/gj " .. vim.fn.getcwd() .. "/**/*")
   vim.cmd("copen")
 end, { nargs = 1 })
-
 vim.keymap.set("n", "<space>sg", ":Vimgrep ")
-
 vim.keymap.set({'n'}, '<space>dd', function() vim.diagnostic.setqflist({ open = true }) end)
--- require('colors.luna_pastel').setup() 
--- vim.cmd.colorscheme("retrobox")
- vim.cmd.colorscheme("lunaperche")
 
--- window manip
-vim.keymap.set('n', "<C-h>", "<C-w><")
-vim.keymap.set('n', "<C-l>", "<C-w>>")
-vim.keymap.set('n', "<C-j>", "<C-w>-")
-vim.keymap.set('n', "<C-k>", "<C-w>+")
-vim.keymap.set('n', "<C-d>", "<C-d>zz")
-vim.keymap.set('n', "<C-u>", "<C-u>zz")
-vim.keymap.set('n', "<space>E", ":Explore<CR>")
-vim.keymap.set('n', "<space>b", ":ls<CR>")
+-- Clangd requried for arduino to work.
+local lsps = {  "basedpyright", "ts_ls", "ast_grep", "arduino_language_server", "clangd", "bashls" } 
 
-local lsps = {  "basedpyright", "ts_ls", "ast_grep", "arduino_language_server", "clangd", "bashls" } -- Clangd requried for arduino to work.
 local ft_formatters = {
     python = {"black"},
     javascript = {"prettier"},
@@ -68,7 +66,7 @@ local plugins = {
     { src = 'https://github.com/mason-org/mason.nvim',                      name = 'mason' },
     { src = 'https://github.com/mason-org/mason-lspconfig.nvim',            name = 'mason-lspconfig' , config = { ensure_installed = lsps, automatic_enable = lsps }},
     { src = 'https://github.com/nvim-tree/nvim-web-devicons',               name = 'nvim-web-devicons' },
-    { src = "https://github.com/ggml-org/llama.vim", name = "llama", config = 'no'}
+    --{ src = "https://github.com/ggml-org/llama.vim", name = "llama", config = 'no'}
 }
 
 vim.pack.add(plugins)
