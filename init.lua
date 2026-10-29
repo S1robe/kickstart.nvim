@@ -1,4 +1,4 @@
-vim.cmd('set shiftwidth=4 signcolumn=yes:1 expandtab softtabstop=-1 autoindent undofile undodir=$HOME/.nvim/undodir listchars=space:·,tab:>> list wildoptions=fuzzy filetype omnifunc=v:lua.vim.lsp.omnifunc notermguicolors')
+vim.cmd('set shiftwidth=4 signcolumn=yes:1 expandtab softtabstop=-1 autoindent undofile undodir=$HOME/.nvim/undodir listchars=space:·,tab:>> wildoptions=fuzzy filetype omnifunc=v:lua.vim.lsp.omnifunc notermguicolors')
 vim.g.netrw_keepdir = 0
 
 local map = function(l, r) vim.keymap.set('n', l, r) end
@@ -16,8 +16,8 @@ vim.api.nvim_create_autocmd("FileType", { pattern = "qf", callback = function() 
 vim.api.nvim_create_autocmd('QuickFixCmdPost', { pattern = 'grep', command = 'cwindow' })
 
 -- Clangd requried for arduino to work.
-local lsps = {  "basedpyright", "ts_ls", "ast_grep", "arduino_language_server", "clangd", "bashls", 'bacon_ls' } 
-local enabled_langs = { 'cpp', 'c', 'javascript', 'typescript', 'python', 'lua', 'bash', 'rust' } 
+local lsps = {  "basedpyright", "ts_ls", "ast_grep", "arduino_language_server", "clangd", "bashls", 'rust_analyzer' } 
+local enabled_langs = { 'cpp', 'c', 'javascript', 'typescript', 'python', 'lua', 'bash', 'rust', 'dart' } 
 local plugins = {
     { src = 'https://github.com/nvim-treesitter/nvim-treesitter',           name = 'nvim-treesitter' },
     { src = 'https://github.com/neovim/nvim-lspconfig',                     name = 'lspconfig', config = 'no'},
